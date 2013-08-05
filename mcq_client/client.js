@@ -91,13 +91,14 @@ $(document).ready(function(){
     retry_timer = window.setTimeout(function() {
       socket.emit('waitlist_req', username_and_nq);
     }, RETRY_DELAY);
-    clearTimeout(retry_timer);
   }
 
   function quizRoom(username_and_room_id) {
+    clearTimeout(retry_timer);
     quiz_room_id = username_and_room_id.room_id;
     showUI('wait_ui', false);
-    showUI('quiz_ui', true);
+
+    // alert(quiz_room_id);
 
     socket.emit('quiz_req', username_and_room_id);
   }
@@ -107,6 +108,7 @@ $(document).ready(function(){
     var image_url = quiz_obj.image_url;
     var choices = quiz_obj.choices;
     var time_limit = quiz_obj.time_limit;
+    showUI('quiz_ui', true);
 
     $('#question').html(question);
     if(quiz.image_url!="") $('#image').html("<img src='" + image_url + "' />");
