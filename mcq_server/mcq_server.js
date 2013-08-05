@@ -29,7 +29,7 @@ var quiz_set = require('./mcq_quiz.json');
 var NUM_QUIZ = quiz_set.length; //  NUM_QUIZ SHOULD BE A MULTIPLE OF NUM_QUESTIONS_PER_QUIZ_ROOM
 var num_waiting_clients = 0;
 var waiting_clients_for_quiz = new Array();
-for(var i=0;i<NUM_QUIZ/NUM_QUESTIONS_PER_QUIZ_ROOM;i++) { waiting_clients_for_quiz[i] = new Array(); }
+for(var i=0;i<NUM_QUIZ;i++) { waiting_clients_for_quiz[i] = new Array(); }
 //  END GLOBAL VARIABLES
 
 //  START CLASS DEFINITIONS
@@ -124,16 +124,16 @@ io.sockets.on('connection', function(socket) {
   function waitlist(username_and_num_obj) {
     var username = username_and_num_obj.username;
     var num = username_and_num_obj.num;
-    var index = num/NUM_QUESTIONS_PER_QUIZ_ROOM;
+    // var index = num/NUM_QUESTIONS_PER_QUIZ_ROOM;
 
     //  UPDATE WAIT LIST
-   if(waiting_clients_for_quiz[index].indexOf(active_clients[username])<0) {
-      waiting_clients_for_quiz[index].push(active_clients[username]);
+   if(waiting_clients_for_quiz[num].indexOf(active_clients[username])<0) {
+      waiting_clients_for_quiz[num].push(active_clients[username]);
       num_waiting_clients++;
-      console.log("#waitlist request received - username: %s, quiz number: %d, waiting: %d", username, num, waiting_clients_for_quiz[index].length);
+      console.log("#waitlist request received - username: %s, quiz number: %d, waiting: %d", username, num, waiting_clients_for_quiz[num].length);
     }
 
-    if(waiting_clients_for_quiz[index].length<NUM_CLIENTS_PER_QUIZ_ROOM) {
+    if(waiting_clients_for_quiz[num].length<NUM_CLIENTS_PER_QUIZ_ROOM) {
       socket.emit('wait', username_and_num_obj);
     }
     else {
@@ -142,48 +142,56 @@ io.sockets.on('connection', function(socket) {
       for(var i=0;i<NUM_QUESTIONS_PER_QUIZ_ROOM;i++) {
         quiz[i] = num + i;
       }
-      var room_id = waiting_clients_for_quiz[index][0].username;
-      var qr = new QuizRoom(room_id, waiting_clients_for_quiz[index], quiz);
+      var room_id = waiting_clients_for_quiz[num][0].username;
+      var qr = new QuizRoom(room_id, waiting_clients_for_quiz[num], quiz);
       active_quiz_rooms[room_id] = qr;
-      for(var i=0;i<waiting_clients_for_quiz[index].length;i++) {
-        io.sockets.socket(waiting_clients_for_quiz[index][i].socket_id).emit('quiz_room', {username:username, room_id:room_id});
+
+      for(var i=0;i<waiting_clients_for_quiz[num].length;i++) {
+        if(socket.id==waiting_clients_for_quiz[num][i].socket_id) {
+          socket.emit('quiz_room', {username:username, room_id:room_id})
+        }
       }
       num_active_quiz_rooms++;
 
       //  UPDATE DB
-      var nq = waiting_clients_for_quiz[index][i].next_quiz + NUM_QUESTIONS_PER_QUIZ_ROOM;
-      db.user_quiz.update({username:username}, {$set: {next_quiz:nq}}, function(err, db_res) {
-        if(err || db_res.length==0) {
-          console.log("#waitlist db update error - username: %s", username + "\n" + err);
-        }
-        else {
-          console.log("#waitlist db updated - username: %s, next_quiz: %d", username, nq);
-        }
-      });
-
-      //  UPDATE WAIT LIST (REMOVE THE MEMBERS FROM THE LIST)
-      for(var j=0;j<waiting_clients_for_quiz[index].length;j++) {
-        var c = waiting_clients_for_quiz[index].shift();
-        num_waiting_clients--;
-        console.log("#waitlist assigned clients - username: %s, quiz number: %d, waiting: %d", c.username, index, waiting_clients_for_quiz[index].length);
-        break;
-      }
+      // for(var i=0;i<waiting_clients_for_quiz[num].length;i++) {
+      //   if(socket.id==waiting_clients_for_quiz[num][i].socket_id) {
+      //     var nq = waiting_clients_for_quiz[num][i].next_quiz + NUM_QUESTIONS_PER_QUIZ_ROOM;
+      //     db.user_quiz.update({username:username}, {$set: {next_quiz:nq}}, function(err, db_res) {
+      //       if(err || db_res.length==0) {
+      //         console.log("#waitlist db update error - username: %s", username + "\n" + err);
+      //       }
+      //       else {
+      //         console.log("#waitlist db updated - username: %s, next_quiz: %d", username, nq);
+      //       }
+      //     });
+      //   }
+      // }
     }
   }
 
   function send_quiz(username_and_room_id) {
     var username = username_and_room_id.username;
     var room_id = username_and_room_id.room_id;
-    console.log("#send quiz request received -  username: %s, room: %s", username, room_id);
+    // console.log("#send quiz request received -  username: %s, room: %s", username, room_id);
 
     var quiz_room = active_quiz_rooms[room_id];
     var members = quiz_room.members;
     var progress = quiz_room.progress;
     var num = quiz_room.quizzes[progress];
 
+    //  UPDATE WAITLIST
+    for(var i=0;i<waiting_clients_for_quiz[num].length;i++) { 
+      waiting_clients_for_quiz[num].shift();
+      console.log("waitlist len - " + waiting_clients_for_quiz[num].length);
+    }
+
     for(var i=0;i<members.length;i++) {
-      io.sockets.socket(members[i].socket_id).emit('quiz', quiz_set[num]);
-      console.log("#send quiz request received -  username: %s, room: %s, quiz number: %d", members[i].username, room_id, num);
+      console.log(members[i].username + " is in " + room_id);
+      // if(socket.id==members[i].socket_id) {
+      //   socket.emit('quiz', quiz_set[num]);
+      //   console.log("#send quiz - username: %s, room: %s, quiz number: %d", members[i].username, room_id, num);
+      // }
     }
   }
 
