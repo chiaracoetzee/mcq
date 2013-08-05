@@ -1,0 +1,90 @@
+#title{
+  color:blue;
+}
+
+#left_container {
+  float: left;
+  border:1px solid lightgray;
+  border-radius:5px;
+  margin:10px;
+  padding:10px;
+  min-height:350px;
+  min-width:500px;
+}
+
+  .choice_container {
+    float: clear;
+    margin: 10px;
+  }
+
+  .choice_box {
+    float: left;
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+    background-color: #CACACA;
+    text-align: center;
+  }
+
+  .choice {
+    float: left;
+  }
+
+  #timer {
+    font-weight: bold;
+    font-size: 150%;
+    text-align: center;
+  }
+
+  #next_button {
+    background-color: orange;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px;
+    width: 150px;
+    height: 20px;
+  }
+
+#right_container {
+  float: left;
+  border:1px solid lightgray;
+  border-radius:5px;
+  margin:10px;
+  padding:10px;
+  height:350px;
+  width:300px;
+  overflow: hidden;
+}
+
+#messages{
+  height:320px;
+  width:100%;
+  border:1px solid lightgray;
+  overflow: scroll;
+}
+
+div.in-message{
+  font-size:11pt;
+  color:green;
+}
+
+div.out-message{
+  font-size:11pt;
+  color:black;
+}
+
+#textinput_container {
+  
+}
+
+  #outgoing-message{
+    width:200px;
+    margin: 10px;
+    border-radius:5px;
+    float: left;
+  }
+
+  #send {
+    float: left;
+    margin: 10px;
+  }

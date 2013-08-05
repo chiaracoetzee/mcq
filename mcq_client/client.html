@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Quiz Room</title>
+    <link rel="stylesheet" type="text/css" href="client.css">
+  </head>
+  <body>
+    <!-- START LOGIN UI -->
+    <div class="login_ui" id="login_panel">
+      <label>Username</label>
+      <input type="text" id="username" name="username" autofocus="autofocus"></input><br/>
+      <label>Password</label>
+      <input type="password" id="password" name="password"></input>
+      <button type="button" id="login" name="login" value="login">Login</button>
+    </div>
+    <!-- END LOGIN UI -->
+
+    <!-- START WAIT UI -->
+    <div class="wait_ui">
+      <img src="http://turbomanage.files.wordpress.com/2009/10/ajax-loader.gif" />Waiting for other users...
+    </div>
+    <!-- END WAIT UI -->
+
+    <!-- START QUIZ_UI -->
+    <div class="quiz_ui" id="left_container">
+      <div id="question">
+      </div>
+      <div id="image">
+      </div>
+      <div id="choices">
+      </div>
+      <div id="timer">
+      </div>
+      <div id="next_button"><label>Next</label>
+      </div>
+    </div>
+    <!-- END QUIZ UI -->
+
+    <!-- START DISCUSSION UI -->
+    <div class="discussion_ui" id="right_container">
+      <div id='messages'>
+      </div>
+      <div class="textinput_container">
+        <input type="text" id="outgoing-message" name="outgoing-message" autofocus="autofocus" />
+        <button type="button" id="send" name="send" value="send">Send</button>
+      </div>
+      <!--<div class="panel">
+        Username:&nbsp;
+        <input type="username" id="username" name="username" />
+        <button type="button" id="change" name="change" value="change">Change</button>
+      </div>-->
+    </div>
+    <!-- END DISCUSSION UI -->
+
+  </body>
+  <script src="socket.io.js"></script>
+  <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+  <script src="jquery.watermark.min.js"></script>
+  <script src="client.js"></script>
+</html>
